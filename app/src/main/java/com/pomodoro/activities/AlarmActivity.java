@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,7 +24,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class AlarmActivity extends Activity {
+public class AlarmActivity extends ActionBarActivity {
 
 	private final long SECOND = 1000; // 1000 miliseconds
 	private final long MINUTE = 60 * SECOND;
