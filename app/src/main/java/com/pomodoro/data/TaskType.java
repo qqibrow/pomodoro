@@ -8,4 +8,8 @@ import com.activeandroid.annotation.Table;
 public class TaskType extends Model{
     @Column(name = "name")
     private String name;
+
+    public TaskType() {
+        super();
+    }
 }

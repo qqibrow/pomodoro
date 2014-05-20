@@ -33,6 +33,11 @@ public class MainActivity extends ActionBarActivity {
         adapter = new TaskAdapter(this, new ArrayList<Task>());
         final ListView listView = (ListView)findViewById(R.id.listView);
         listView.setAdapter(adapter);
+
+        // Load data from database at first time.
+        adapter.addAll(Task.getAll());
+
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -52,7 +57,7 @@ public class MainActivity extends ActionBarActivity {
                     String text = v.getText().toString();
                     Task t = new Task(text);
                     adapter.add(t);
-
+                    t.save();
                     // Do the clear stuffs.
                     // Give up focus to the list view.
                     input_task.clearFocus();
