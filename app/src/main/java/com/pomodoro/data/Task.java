@@ -57,7 +57,7 @@ public class Task extends Model{
 
     public static List<Task> getAll() {
         return new Select().from(Task.class)
-                .orderBy("CreateTime DSC")
+                .orderBy("CreateTime DESC")
                 .execute();
 
     }
