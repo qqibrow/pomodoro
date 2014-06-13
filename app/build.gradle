@@ -12,6 +12,7 @@ android {
     dependencies {
         compile "com.android.support:appcompat-v7:18.0.+"
         compile files('libs/ActiveAndroid.jar')
+        compile 'com.nhaarman.listviewanimations:library:2.6.0'
     }
 
     buildTypes {
