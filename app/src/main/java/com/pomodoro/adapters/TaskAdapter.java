@@ -4,13 +4,16 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 
+import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.pomodoro.activities.R;
 import com.pomodoro.data.Task;
 import android.content.Context;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -51,6 +54,17 @@ public class TaskAdapter extends ArrayAdapter<Task> {
         List<Task> task2remove = new LinkedList<Task>();
         for(int i = 0; i < checkedItemPositions.size(); ++i) {
             task2remove.add(getItem(checkedItemPositions.keyAt(i)));
+        }
+        for(Task t : task2remove) {
+            t.delete();
+            super.remove(t);
+        }
+    }
+
+    public void removeItemsInBatch(final int[] positions) {
+        List<Task> task2remove = new LinkedList<Task>();
+        for(int pos : positions) {
+            task2remove.add(getItem(pos));
         }
         for(Task t : task2remove) {
             t.delete();

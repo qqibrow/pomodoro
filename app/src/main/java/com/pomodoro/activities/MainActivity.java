@@ -25,16 +25,14 @@ import com.pomodoro.adapters.TaskAdapter;
 import com.pomodoro.data.Task;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
 
     TaskAdapter taskAdapter;
-    List<Task> taskDataSource;
     AnimateDismissAdapter animateDismissAdapter;
-
-    List<Integer> mSelectedPositions = new ArrayList<Integer>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +42,9 @@ public class MainActivity extends ActionBarActivity {
         final ListView listView = (ListView)findViewById(R.id.listView);
 
         // Load data from database at first time.
-        taskDataSource = Task.getAll();
 
         // Create data adapter and set it to ListView.
-        taskAdapter = new TaskAdapter(this, taskDataSource);
+        taskAdapter = new TaskAdapter(this, Task.getAll());
         listView.setAdapter(taskAdapter);
         // Set Click to delete function.
         setLongClickToDelete(listView);
@@ -59,9 +56,15 @@ public class MainActivity extends ActionBarActivity {
          if there is a way.
           */
 
-//        animateDismissAdapter = new AnimateDismissAdapter(taskAdapter, new MyOnDismissCallback());
-//        animateDismissAdapter.setAbsListView(listView);
-//        listView.setAdapter(animateDismissAdapter);
+        animateDismissAdapter = new AnimateDismissAdapter(taskAdapter, new OnDismissCallback() {
+            @Override
+            public void onDismiss(final AbsListView listView, final int[] reverseSortedPositions) {
+                taskAdapter.removeItemsInBatch(reverseSortedPositions);
+            }
+        });
+
+        animateDismissAdapter.setAbsListView(listView);
+        listView.setAdapter(animateDismissAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -69,8 +72,7 @@ public class MainActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Task task = (Task)parent.getItemAtPosition(position);
                 String info = String.format("task %s is select.", task.getName());
-                Toast.makeText(MainActivity.this, info, Toast.LENGTH_SHORT);
-
+                Toast.makeText(MainActivity.this, info, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -126,7 +128,13 @@ public class MainActivity extends ActionBarActivity {
                 switch (item.getItemId()) {
                     case R.id.action_delete:
                         SparseBooleanArray checkedItemPositions = listView.getCheckedItemPositions();
-                        taskAdapter.removeItemsInBatch(checkedItemPositions);
+
+                        //taskAdapter.removeItemsInBatch(checkedItemPositions);
+                        List<Integer> list = new LinkedList<Integer>();
+                        for(int i = 0; i < checkedItemPositions.size(); ++i) {
+                            list.add(checkedItemPositions.keyAt(i));
+                        }
+                        animateDismissAdapter.animateDismiss(list);
                         mode.finish(); // Action picked, so close the CAB
                         return true;
                     default:
@@ -172,27 +180,6 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
         });
-    }
-
-    private void removeItem(int index) {
-        taskDataSource.remove(index);
-        this.runOnUiThread(new Runnable() {
-            public void run() {
-                taskAdapter.notifyDataSetChanged();
-            }
-        });
-    }
-
-    private class MyOnDismissCallback implements OnDismissCallback {
-
-        @Override
-        public void onDismiss(final AbsListView listView, final int[] reverseSortedPositions) {
-            for (int position : reverseSortedPositions) {
-                removeItem(position);
-                String info = String.format("Position %d is about to delete.", position);
-                System.out.println(info);
-            }
-        }
     }
 
     private void hideSoftKeyboard(View view){
