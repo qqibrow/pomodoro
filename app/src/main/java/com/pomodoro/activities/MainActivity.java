@@ -14,7 +14,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -50,7 +49,6 @@ public class MainActivity extends ActionBarActivity {
         // Create data adapter and set it to ListView.
         taskAdapter = new TaskAdapter(this, taskDataSource);
         listView.setAdapter(taskAdapter);
-
         // Set Click to delete function.
         setLongClickToDelete(listView);
         /*
@@ -72,14 +70,6 @@ public class MainActivity extends ActionBarActivity {
                 Task task = (Task)parent.getItemAtPosition(position);
                 String info = String.format("task %s is select.", task.getName());
                 Toast.makeText(MainActivity.this, info, Toast.LENGTH_SHORT);
-//                System.out.println("Position " + position + " is selected");
-//                CheckBox cb = (CheckBox)view.findViewById(R.id.taskSelectCheckBox);
-//                cb.toggle();
-//                if(cb.isChecked()) {
-//                    mSelectedPositions.add(position);
-//                } else {
-//                    mSelectedPositions.remove((Integer)position);
-//                }
 
             }
         });
@@ -101,7 +91,6 @@ public class MainActivity extends ActionBarActivity {
                     should show up in the front. Therefore, I use insert here.
                      */
                     taskAdapter.addNewItem(t);
-                    t.save();
                     // Do the clear stuffs.
                     // Give up focus to the list view.
                     createNewTaskEditText.clearFocus();
@@ -128,7 +117,6 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position,
                                                   long id, boolean checked) {
-                listView.setItemChecked(position, checked);
                 setSubtitle(mode);
             }
 
@@ -137,11 +125,8 @@ public class MainActivity extends ActionBarActivity {
                 // Respond to clicks on the actions in the CAB
                 switch (item.getItemId()) {
                     case R.id.action_delete:
-                        for(int i = 0; i < listView.getCount(); ++i) {
-                            if(listView.isItemChecked(i)) {
-                                Toast.makeText(getApplicationContext(), i + " is checked", Toast.LENGTH_SHORT).show();
-                            }
-                        }
+                        SparseBooleanArray checkedItemPositions = listView.getCheckedItemPositions();
+                        taskAdapter.removeItemsInBatch(checkedItemPositions);
                         mode.finish(); // Action picked, so close the CAB
                         return true;
                     default:
@@ -235,7 +220,6 @@ public class MainActivity extends ActionBarActivity {
         else if(id == R.id.action_search) {
             //animateDismissAdapter.animateDismiss(mSelectedPositions);
             //mSelectedPositions.clear();
-            taskAdapter.removeItem(0);
         }
         return super.onOptionsItemSelected(item);
     }

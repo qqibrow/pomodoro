@@ -1,5 +1,6 @@
 package com.pomodoro.adapters;
 
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,35 +23,17 @@ import java.util.Objects;
  */
 public class TaskAdapter extends ArrayAdapter<Task> {
 
-    List<Boolean> itemChecked; // track which position has been selected.
-
     final static int First_SLOT = 0;
 
     public TaskAdapter(Context context, List<Task> tasks) {
         super(context, R.layout.row, tasks);
-
-        /*
-         Init items to label which task is checked or not.
-          */
-        itemChecked = new ArrayList<Boolean>(tasks.size());
-        for(int i = 0; i < tasks.size(); ++i)
-            itemChecked.add(false);
+        setNotifyOnChange(true);
     }
 
     public void addNewItem(Task t) {
         // Insert actual data into adapter.
+        t.save();
         this.insert(t, First_SLOT);
-
-        // Insert data into item checked list.
-        this.itemChecked.add(First_SLOT, false);
-    }
-
-    public void removeItem(int position) {
-        itemChecked.remove(position);
-        Task item2remove = this.getItem(position);
-        item2remove.delete();
-        super.remove(item2remove);
-        notifyDataSetChanged();
     }
 
     @Override
@@ -60,23 +44,17 @@ public class TaskAdapter extends ArrayAdapter<Task> {
         }
         TextView tvName = (TextView)convertView.findViewById(R.id.tvName);
         tvName.setText(task.getName());
-
-        CheckBox cb = (CheckBox)convertView.findViewById(R.id.taskSelectCheckBox);
-        cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                if (isChecked) {
-                    itemChecked.set(position, true);
-                } else {
-                    itemChecked.set(position, false);
-                }
-            }
-        });
-        cb.setChecked(itemChecked.get(position));
-
         return convertView;
     }
 
+    public void removeItemsInBatch(SparseBooleanArray checkedItemPositions) {
+        List<Task> task2remove = new LinkedList<Task>();
+        for(int i = 0; i < checkedItemPositions.size(); ++i) {
+            task2remove.add(getItem(checkedItemPositions.keyAt(i)));
+        }
+        for(Task t : task2remove) {
+            t.delete();
+            super.remove(t);
+        }
+    }
 }
