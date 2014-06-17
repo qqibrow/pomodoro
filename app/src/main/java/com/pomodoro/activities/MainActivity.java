@@ -3,8 +3,10 @@ package com.pomodoro.activities;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -34,18 +36,64 @@ public class MainActivity extends ActionBarActivity {
 
     List<Integer> mSelectedPositions = new ArrayList<Integer>();
 
+    ListView listView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final ListView listView = (ListView)findViewById(R.id.listView);
+        listView = (ListView)findViewById(R.id.listView);
 
         // Load data from database at first time.
         taskDataSource = Task.getAll();
         taskAdapter = new TaskAdapter(this, taskDataSource);
         listView.setAdapter(taskAdapter);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        listView.setMultiChoiceModeListener(new ListView.MultiChoiceModeListener() {
 
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position,
+                                                  long id, boolean checked) {
+                // Here you can do something when items are selected/de-selected,
+                // such as update the title in the CAB
+                System.out.println("here");
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                // Respond to clicks on the actions in the CAB
+                switch (item.getItemId()) {
+                    case R.id.action_delete:
+                        mode.finish(); // Action picked, so close the CAB
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                // Inflate the menu for the CAB
+                System.out.println("Helre1");
+                MenuInflater inflater = mode.getMenuInflater();
+                inflater.inflate(R.menu.delete_menu, menu);
+                return true;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                // Here you can make any necessary updates to the activity when
+                // the CAB is removed. By default, selected items are deselected/unchecked.
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                // Here you can perform updates to the CAB due to
+                // an invalidate() request
+                return false;
+            }
+        });
         /*
          Create animation dismissAdapter using baseAdapter.
          It is not necessary to use a global reference here but I have to because I need to use
@@ -63,7 +111,8 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Task task = (Task)parent.getItemAtPosition(position);
-
+                String info = String.format("task %s is select.", task.getName());
+                Toast.makeText(MainActivity.this, info, Toast.LENGTH_SHORT);
 //                System.out.println("Position " + position + " is selected");
 //                CheckBox cb = (CheckBox)view.findViewById(R.id.taskSelectCheckBox);
 //                cb.toggle();
@@ -160,6 +209,9 @@ public class MainActivity extends ActionBarActivity {
             //animateDismissAdapter.animateDismiss(mSelectedPositions);
             //mSelectedPositions.clear();
             taskAdapter.removeItem(0);
+            boolean longClickable =listView.isLongClickable();
+            //Toast.makeText(getApplicationContext(), "haha" + longClickable, Toast.LENGTH_SHORT);
+            System.out.println("haha" + longClickable);
         }
         return super.onOptionsItemSelected(item);
     }
