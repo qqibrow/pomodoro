@@ -30,7 +30,7 @@ public class AlarmActivity extends ActionBarActivity {
 	private final long START_TIME = 30 * SECOND;
 
 	// All the views.
-	private Button startBtn;
+	private Button startBtn, stopBtn;
 	private TextView timerText;
 	private RingView ring;
 
@@ -67,14 +67,17 @@ public class AlarmActivity extends ActionBarActivity {
 
 	void initAllViews() {
 		startBtn = (Button) this.findViewById(R.id.startBtn);
+        stopBtn = (Button) this.findViewById(R.id.stopBtn);
+        stopBtn.setEnabled(false);
+
 		timerText = (TextView) this.findViewById(R.id.timer);
 		ring = (RingView) this.findViewById(R.id.timerAnim);
 		
 		// Assign special font to button and timerText.
 		Typeface font = Typeface.createFromAsset(getAssets(), CHUNK_FIVE);
 		timerText.setTypeface(font);
-		startBtn.setTypeface(font);
-		
+//		startBtn.setTypeface(font);
+//        stopBtn.setTypeface(font);
 		// (TODO)Put startBtn the the ring place regardless of the devices.
 
 	}
@@ -91,15 +94,28 @@ public class AlarmActivity extends ActionBarActivity {
 	}
 
 	public void onClickStartBtn(View w) {
-		if (!timerStarted) {
-			timer.start();
-			timerStarted = true;
-			startBtn.setText("STOP");
-		} else {
-			timer.cancel();
-			resetTimer();
-		}
+//		if (!timerStarted) {
+//			timer.start();
+//			timerStarted = true;
+//            exchangeActivation(startBtn, stopBtn);
+//		} else {
+//			timer.cancel();
+//			resetTimer();
+//            exchangeActivation(stopBtn, startBtn);
+//
+//		}
+        timer.start();
+        exchangeActivation(startBtn, stopBtn);
 	}
+    private void exchangeActivation(Button b1, Button b2) {
+        b1.setEnabled(false);
+        b2.setEnabled(true);
+    }
+    public void onClickStopBtn(View v) {
+        timer.cancel();
+        resetTimer();
+        exchangeActivation(stopBtn, startBtn);
+    }
 
 	private void resetTimer() {
 		// Reset Text for timer.
@@ -110,9 +126,6 @@ public class AlarmActivity extends ActionBarActivity {
 
 		// Reset the flag.
 		timerStarted = false;
-
-		// Reset button text.
-		startBtn.setText("Start");
 
 		// Clear animation for timer text.
 		timerText.clearAnimation();

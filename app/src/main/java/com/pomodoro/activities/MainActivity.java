@@ -45,7 +45,7 @@ public class MainActivity extends ActionBarActivity {
         // Load data from database at first time.
 
         // Create data adapter and set it to ListView.
-        taskAdapter = new TaskAdapter(this, new ArrayList<Task>());
+        taskAdapter = new TaskAdapter(this, Task.getAll());
         listView.setAdapter(taskAdapter);
         listView.setEmptyView(findViewById(android.R.id.empty));
 
