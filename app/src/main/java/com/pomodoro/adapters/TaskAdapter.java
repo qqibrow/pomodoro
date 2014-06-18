@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +38,7 @@ public class TaskAdapter extends ArrayAdapter<Task> {
         // Insert actual data into adapter.
         t.save();
         this.insert(t, First_SLOT);
+        System.out.println("Added new Item.\n" + t);
     }
 
     @Override
@@ -47,6 +49,9 @@ public class TaskAdapter extends ArrayAdapter<Task> {
         }
         TextView tvName = (TextView)convertView.findViewById(R.id.tvName);
         tvName.setText(task.getName());
+
+        TextView pomoNum = (TextView) convertView.findViewById(R.id.pomoNum);
+        pomoNum.setText("" + task.getFinishedPomo());
         return convertView;
     }
 

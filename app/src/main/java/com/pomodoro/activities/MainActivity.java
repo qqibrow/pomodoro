@@ -1,6 +1,7 @@
 package com.pomodoro.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.SparseBooleanArray;
@@ -73,6 +74,12 @@ public class MainActivity extends ActionBarActivity {
                 Task task = (Task)parent.getItemAtPosition(position);
                 String info = String.format("task %s is select.", task.getName());
                 Toast.makeText(MainActivity.this, info, Toast.LENGTH_SHORT).show();
+
+
+                Intent intent = new Intent(MainActivity.this, AlarmActivity.class);
+                intent.putExtra(AlarmActivity.POS, task);
+                startActivity(intent);
+
             }
         });
 
@@ -207,6 +214,7 @@ public class MainActivity extends ActionBarActivity {
         else if(id == R.id.action_search) {
             //animateDismissAdapter.animateDismiss(mSelectedPositions);
             //mSelectedPositions.clear();
+
         }
         return super.onOptionsItemSelected(item);
     }

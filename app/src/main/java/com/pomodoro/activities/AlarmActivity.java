@@ -1,5 +1,6 @@
 package com.pomodoro.activities;
 
+import com.pomodoro.data.Task;
 import com.pomodoro.widgets.RingView;
 
 import android.media.Ringtone;
@@ -44,6 +45,10 @@ public class AlarmActivity extends ActionBarActivity {
 
 	private Ringtone r;
 
+
+    // Extra info from intent
+    public static final String POS = "com.pomodoro.activities.AlarmActivity.POS";
+    private int TaskIndex;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -51,11 +56,16 @@ public class AlarmActivity extends ActionBarActivity {
 		initAllViews();
 		initAllDataLogic();
 
+        // extract intent.
+        Intent intent = getIntent();
+        Task t = (Task)intent.getParcelableExtra(AlarmActivity.POS);
+
 		Uri notification = RingtoneManager
 				.getDefaultUri(RingtoneManager.TYPE_ALARM);
 		r = RingtoneManager.getRingtone(getApplicationContext(), notification);
 
 		resetTimer();
+        getSupportActionBar().setTitle(t.getName());
 	}
 
 	void initAllViews() {
