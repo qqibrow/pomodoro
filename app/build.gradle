@@ -2,15 +2,15 @@ apply plugin: 'android'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.3"
+    buildToolsVersion "19.1.0"
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 18
+        targetSdkVersion 19
     }
 
     dependencies {
-        compile "com.android.support:appcompat-v7:18.0.+"
+        compile "com.android.support:appcompat-v7:19.0.+"
         compile files('libs/ActiveAndroid.jar')
         compile 'com.nhaarman.listviewanimations:library:2.6.0'
     }

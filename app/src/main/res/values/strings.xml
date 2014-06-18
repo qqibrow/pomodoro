@@ -10,4 +10,5 @@
     <string name="action_search">Search</string>
     <string name="input_task_hint">Add a Task...</string>
     <string name="action_remove">Delete</string>
+    <string name="no_tasks">Start A New Task!</string>
 </resources>

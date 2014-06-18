@@ -29,9 +29,16 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 
     final static int First_SLOT = 0;
 
+    List<Task> tasks;
+
     public TaskAdapter(Context context, List<Task> tasks) {
         super(context, R.layout.row, tasks);
+        this.tasks = tasks;
         setNotifyOnChange(true);
+    }
+    @Override
+    public int getCount() {
+        return tasks.size();
     }
 
     public void addNewItem(Task t) {

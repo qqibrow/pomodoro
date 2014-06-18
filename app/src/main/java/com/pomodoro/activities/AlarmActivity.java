@@ -155,8 +155,6 @@ public class AlarmActivity extends ActionBarActivity {
 					AlarmActivity.this, R.anim.tween);
 			timerText.startAnimation(myFadeInAnimation);
 
-			// Start blaking animation for ring.
-
 			// Send notification to users.
 			int mId = 17;
 
