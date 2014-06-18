@@ -26,6 +26,7 @@ public class RingView extends View {
 		// Init all drawing facilities here.
 		// Only init here, we can get the height and width of the view.
 		initDrawingFacilities();
+        invalidate();
 		super.onWindowFocusChanged(hasFocus); 
 		}
 	public float getPhase() {

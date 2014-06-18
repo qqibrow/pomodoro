@@ -8,8 +8,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.app.Activity;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -48,7 +46,6 @@ public class AlarmActivity extends ActionBarActivity {
 
     // Extra info from intent
     public static final String POS = "com.pomodoro.activities.AlarmActivity.POS";
-    private int TaskIndex;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
