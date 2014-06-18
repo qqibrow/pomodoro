@@ -11,13 +11,27 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
-public class RingView extends View {
-	private float Phase = 0;
+/*
+    A ProgressRingView could be used to show progress of certain task. The main function is
+    setPhase() method, which used to show how much has been done.
+
+    The main usage is:
+    As the task started, call setPhase(ProgressRingView.START);
+    In the progess, call setPhase()
+    Once done, call setPhase(ProgressRingView.FINISHED);
+ */
+public class ProgressRingView extends View {
+    public static final float FINISHED = 1.0f;
+    public static final float START = 0.0f;
+
+    // a float between 0 and 1 show how much has been done.
+    // 1 means finish, and 0 means start.
+    private float Phase = 0;
 	
-	public RingView(Context context) {
+	public ProgressRingView(Context context) {
 		super(context);
 	}
-	public RingView(Context context, AttributeSet attrs) {
+	public ProgressRingView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
 	
@@ -56,7 +70,7 @@ public class RingView extends View {
 			return;
 		canvas.drawArc(circle, 0, 360, false, ringPaint);
 		
-		// Draw foreground moving ring.
+		// Draw foreground moving ring which shows progress.
 		canvas.rotate(-90, center.x, center.y);
 		canvas.drawArc(circle, 0, -360*Phase, false, ringPaintShowProgress);
 	}

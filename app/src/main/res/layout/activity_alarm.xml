@@ -12,12 +12,12 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <com.pomodoro.widgets.RingView
+        <com.pomodoro.widgets.ProgressRingView
             android:id="@+id/timerAnim"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center" >
-        </com.pomodoro.widgets.RingView>
+        </com.pomodoro.widgets.ProgressRingView>
 
         <TextView
             android:id="@+id/timer"

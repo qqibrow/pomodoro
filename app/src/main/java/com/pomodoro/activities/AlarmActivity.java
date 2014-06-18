@@ -1,7 +1,7 @@
 package com.pomodoro.activities;
 
 import com.pomodoro.data.Task;
-import com.pomodoro.widgets.RingView;
+import com.pomodoro.widgets.ProgressRingView;
 
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -32,7 +32,7 @@ public class AlarmActivity extends ActionBarActivity {
 	// All the views.
 	private Button startBtn, stopBtn;
 	private TextView timerText;
-	private RingView ring;
+	private ProgressRingView ring;
 
 	// All the data logic.
 	private Boolean timerStarted = false;
@@ -71,7 +71,7 @@ public class AlarmActivity extends ActionBarActivity {
         stopBtn.setEnabled(false);
 
 		timerText = (TextView) this.findViewById(R.id.timer);
-		ring = (RingView) this.findViewById(R.id.timerAnim);
+		ring = (ProgressRingView) this.findViewById(R.id.timerAnim);
 		
 		// Assign special font to button and timerText.
 		Typeface font = Typeface.createFromAsset(getAssets(), CHUNK_FIVE);
@@ -107,17 +107,19 @@ public class AlarmActivity extends ActionBarActivity {
         timer.start();
         exchangeActivation(startBtn, stopBtn);
 	}
-    private void exchangeActivation(Button b1, Button b2) {
-        b1.setEnabled(false);
-        b2.setEnabled(true);
-    }
+
     public void onClickStopBtn(View v) {
         timer.cancel();
         resetTimer();
         exchangeActivation(stopBtn, startBtn);
     }
 
-	private void resetTimer() {
+    private void exchangeActivation(Button b1, Button b2) {
+        b1.setEnabled(false);
+        b2.setEnabled(true);
+    }
+
+    private void resetTimer() {
 		// Reset Text for timer.
 		long leftMinutes = START_TIME / MINUTE;
 		long leftSeconds = (START_TIME % MINUTE) / SECOND;
@@ -129,7 +131,7 @@ public class AlarmActivity extends ActionBarActivity {
 
 		// Clear animation for timer text.
 		timerText.clearAnimation();
-		ring.setPhase(0);
+		ring.setPhase(ProgressRingView.START);
 
 		// reset ringtone.
 		if (r.isPlaying())
@@ -161,7 +163,7 @@ public class AlarmActivity extends ActionBarActivity {
 		@Override
 		public void onFinish() {
 			timerText.setText("00:00");
-			ring.setPhase(1);
+			ring.setPhase(ProgressRingView.FINISHED);
 
 			// Start the shining animation for view.
 			Animation myFadeInAnimation = AnimationUtils.loadAnimation(
