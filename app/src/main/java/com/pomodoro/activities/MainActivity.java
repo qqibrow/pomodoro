@@ -47,6 +47,8 @@ public class MainActivity extends ActionBarActivity {
         // Create data adapter and set it to ListView.
         taskAdapter = new TaskAdapter(this, new ArrayList<Task>());
         listView.setAdapter(taskAdapter);
+        listView.setEmptyView(findViewById(android.R.id.empty));
+
         // Set Click to delete function.
         setLongClickToDelete(listView);
         /*

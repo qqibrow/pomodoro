@@ -41,6 +41,9 @@ public class TaskAdapter extends ArrayAdapter<Task> {
         return tasks.size();
     }
 
+
+
+
     public void addNewItem(Task t) {
         // Insert actual data into adapter.
         t.save();
