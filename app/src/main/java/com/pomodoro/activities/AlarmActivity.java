@@ -2,6 +2,7 @@ package com.pomodoro.activities;
 
 import com.pomodoro.data.Task;
 import com.pomodoro.widgets.ProgressRingView;
+import com.pomodoro.widgets.RingTimer;
 
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -36,7 +37,7 @@ public class AlarmActivity extends ActionBarActivity {
 
 	// All the data logic.
 	private Boolean timerStarted = false;
-	private myCountDownTimer timer;
+	private RingTimerWithRingtone timer;
 
 	// Some hardcode string which could move to configuration file.
 	private static final String CHUNK_FIVE = "fonts/Chunkfive.otf";
@@ -83,7 +84,7 @@ public class AlarmActivity extends ActionBarActivity {
 	}
 
 	void initAllDataLogic() {
-		timer = new myCountDownTimer(START_TIME, SECOND);
+		timer = new RingTimerWithRingtone(ring, timerText, START_TIME, SECOND);
 	}
 
 	@Override
@@ -146,7 +147,27 @@ public class AlarmActivity extends ActionBarActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+    private class RingTimerWithRingtone extends RingTimer {
 
+        public RingTimerWithRingtone(ProgressRingView ringView, TextView textView, long millisInFuture, long countDownInterval) {
+            super(ringView, textView, millisInFuture, countDownInterval);
+        }
+
+        @Override
+        protected void onFinish() {
+            super.onFinish();
+            // Send notification to users.
+            //popupNotification();
+
+
+            try {
+                r.play();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
 	/*
 	 * TODO(lniu) Use builder to refactor myCountDownTimer so that it will
 	 * encapsulate all the data change inside the class.
@@ -154,61 +175,65 @@ public class AlarmActivity extends ActionBarActivity {
 	 * Like CounDOwnTimer.builder builder = new ... builder.setBtn();
 	 * builder.setText(); myCountDownTimer timer = builder.build();
 	 */
-	private class myCountDownTimer extends CountDownTimer {
+//	private class myCountDownTimer extends CountDownTimer {
+//
+//		public myCountDownTimer(long millisInFuture, long countDownInterval) {
+//			super(millisInFuture, countDownInterval);
+//		}
+//
+//		@Override
+//		public void onFinish() {
+//			timerText.setText("00:00");
+//			ring.setPhase(ProgressRingView.FINISHED);
+//
+//			// Start the shining animation for view.
+//			Animation myFadeInAnimation = AnimationUtils.loadAnimation(
+//					AlarmActivity.this, R.anim.tween);
+//			timerText.startAnimation(myFadeInAnimation);
+//
+//			// Send notification to users.
+//            popupNotification();
+//
+//
+//            try {
+//				r.play();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//
+//		}
+//
+//		@Override
+//		public void onTick(long millisUntilFinished) {
+//			long leftMinutes = millisUntilFinished / MINUTE;
+//			long leftSeconds = (millisUntilFinished % MINUTE) / SECOND;
+//			timerText.setText(String.format("%02d:%02d", leftMinutes,
+//					leftSeconds));
+//
+//			float phase = (float) (START_TIME - (millisUntilFinished / 1000) * 1000)
+//					/ START_TIME;
+//			ring.setPhase(phase);
+//		}
+//
+//	}
 
-		public myCountDownTimer(long millisInFuture, long countDownInterval) {
-			super(millisInFuture, countDownInterval);
-		}
+    private void popupNotification() {
+        int mId = 17;
+        // Set the default behavior to open existing activity.
+        Intent intent = new Intent(this, AlarmActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        PendingIntent pIntent = PendingIntent.getActivity(
+                this, 0, intent, 0);
 
-		@Override
-		public void onFinish() {
-			timerText.setText("00:00");
-			ring.setPhase(ProgressRingView.FINISHED);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+                this).setSmallIcon(R.drawable.tomato2)
+                .setContentTitle("Pomodoro")
+                .setContentText("Congrats! You got your Pomodoro!")
+                .setContentIntent(pIntent).setAutoCancel(true);
 
-			// Start the shining animation for view.
-			Animation myFadeInAnimation = AnimationUtils.loadAnimation(
-					AlarmActivity.this, R.anim.tween);
-			timerText.startAnimation(myFadeInAnimation);
-
-			// Send notification to users.
-			int mId = 17;
-
-			// Set the default behavior to open existing activity.
-			Intent intent = new Intent(AlarmActivity.this, AlarmActivity.class);
-			intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-			PendingIntent pIntent = PendingIntent.getActivity(
-					AlarmActivity.this, 0, intent, 0);
-
-			NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-					AlarmActivity.this).setSmallIcon(R.drawable.tomato2)
-					.setContentTitle("Pomodoro")
-					.setContentText("Congrats! You got your Pomodoro!")
-					.setContentIntent(pIntent).setAutoCancel(true);
-
-			NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-			// mId allows you to update the notification later on.
-			mNotificationManager.notify(mId, mBuilder.build());
-
-			try {
-				r.play();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		}
-
-		@Override
-		public void onTick(long millisUntilFinished) {
-			long leftMinutes = millisUntilFinished / MINUTE;
-			long leftSeconds = (millisUntilFinished % MINUTE) / SECOND;
-			timerText.setText(String.format("%02d:%02d", leftMinutes,
-					leftSeconds));
-
-			float phase = (float) (START_TIME - (millisUntilFinished / 1000) * 1000)
-					/ START_TIME;
-			ring.setPhase(phase);
-		}
-
-	}
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        // mId allows you to update the notification later on.
+        mNotificationManager.notify(mId, mBuilder.build());
+    }
 
 }

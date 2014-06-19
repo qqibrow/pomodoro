@@ -19,18 +19,18 @@ public class RingTimer {
     private static final long MINUTE = 60 * SECOND;
     private static final long START_TIME = 30 * SECOND;
 
-    RingTimer(ProgressRingView ringView, TextView textView,
+    public RingTimer(ProgressRingView ringView, TextView textView,
               long millisInFuture, long countDownInterval) {
         this.ringView = ringView;
         this.textView = textView;
         this.timer = new myCountDownTimer(millisInFuture, countDownInterval);
     }
 
-    final void start() {
+    public final void start() {
         timer.start();
     }
 
-    final void cancel() {
+    public final void cancel() {
         timer.cancel();
     }
 
