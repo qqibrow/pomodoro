@@ -11,7 +11,7 @@ import android.widget.TextView;
 public class RingTimer {
     private final ProgressRingView ringView;
     private final TextView textView;
-    private final myCountDownTimer timer;
+    private myCountDownTimer timer;
 
     private Animation onFinishedAnimation = null;
 
@@ -20,6 +20,13 @@ public class RingTimer {
 
 
     private long timeInterval;
+
+    public RingTimer(ProgressRingView ringView, TextView textView) {
+        this.ringView = ringView;
+        this.textView = textView;
+        this.timer = new myCountDownTimer(MINUTE, SECOND);
+        timeInterval = SECOND;
+    }
 
     public RingTimer(ProgressRingView ringView, TextView textView,
               long millisInFuture, long countDownInterval) {
@@ -31,6 +38,12 @@ public class RingTimer {
 
     public final void start() {
         timer.start();
+    }
+
+    public final void setTimer( long millisInFuture, long countDownInterval) {
+        this.timer = new myCountDownTimer(millisInFuture, countDownInterval);
+        timeInterval = millisInFuture;
+        this.init();
     }
 
     public final void cancel() {

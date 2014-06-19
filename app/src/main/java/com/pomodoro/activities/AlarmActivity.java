@@ -1,9 +1,8 @@
 package com.pomodoro.activities;
 
 import com.pomodoro.data.Task;
+import com.pomodoro.widgets.PomoTimer;
 import com.pomodoro.widgets.ProgressRingView;
-import com.pomodoro.widgets.RingTimer;
-import com.pomodoro.widgets.RingTimerWithRingtone;
 
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -24,14 +23,11 @@ import android.widget.TextView;
 
 public class AlarmActivity extends ActionBarActivity {
 
-	private final long SECOND = 1000; // 1000 miliseconds
-	private final long MINUTE = 60 * SECOND;
-
-	private final long WORKING_TIME = 25 * MINUTE;
-    private final long REST_TIME = 5 * MINUTE;
+//	private final long WORKING_TIME = 25 * MINUTE;
+//    private final long REST_TIME = 5 * MINUTE;
 
 	// All the views.
-	private RingTimerWithRingtone timer;
+	private PomoTimer timer;
 
 	// Some hardcode string which could move to configuration file.
 	private static final String CHUNK_FIVE = "fonts/Chunkfive.otf";
@@ -67,7 +63,7 @@ public class AlarmActivity extends ActionBarActivity {
         Typeface font = Typeface.createFromAsset(getAssets(), CHUNK_FIVE);
         timerText.setTypeface(font);
 
-        timer = new RingTimerWithRingtone(ring, timerText, WORKING_TIME, SECOND, ringtone);
+        timer = new PomoTimer(ring, timerText, ringtone);
         timer.init();
     }
 
@@ -91,6 +87,14 @@ public class AlarmActivity extends ActionBarActivity {
                 exchangeActivation(stopBtn, startBtn);
             }
         });
+
+        timer.setOnFinishListener(new PomoTimer.onFinishListener() {
+
+            @Override
+            public void onFinish(PomoTimer pomo) {
+                exchangeActivation(stopBtn, startBtn);
+            }
+        });
     }
 
     @Override
@@ -109,7 +113,6 @@ public class AlarmActivity extends ActionBarActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
-
 		}
 		return super.onOptionsItemSelected(item);
 	}
