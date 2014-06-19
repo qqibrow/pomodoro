@@ -3,6 +3,7 @@ package com.pomodoro.activities;
 import com.pomodoro.data.Task;
 import com.pomodoro.widgets.ProgressRingView;
 import com.pomodoro.widgets.RingTimer;
+import com.pomodoro.widgets.RingTimerWithRingtone;
 
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -25,17 +26,17 @@ public class AlarmActivity extends ActionBarActivity {
 
 	private final long SECOND = 1000; // 1000 miliseconds
 	private final long MINUTE = 60 * SECOND;
-	private final long START_TIME = 30 * SECOND;
+
+	private final long WORKING_TIME = 25 * MINUTE;
+    private final long REST_TIME = 5 * MINUTE;
 
 	// All the views.
-	private Button startBtn, stopBtn;
 	private RingTimerWithRingtone timer;
 
 	// Some hardcode string which could move to configuration file.
 	private static final String CHUNK_FIVE = "fonts/Chunkfive.otf";
 
-	private Ringtone r;
-
+    private Task task;
 
     // Extra info from intent
     public static final String POS = "com.pomodoro.activities.AlarmActivity.POS";
@@ -43,49 +44,61 @@ public class AlarmActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_alarm);
+
+        // Get passed-in task.
         Intent intent = getIntent();
-        Task t = (Task)intent.getParcelableExtra(AlarmActivity.POS);
+        task = intent.getParcelableExtra(AlarmActivity.POS);
 
-		Uri notification = RingtoneManager
-				.getDefaultUri(RingtoneManager.TYPE_ALARM);
-		r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+        // Setup timer with ringtone.
+        Uri notification = RingtoneManager
+                .getDefaultUri(RingtoneManager.TYPE_ALARM);
+        Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+        setUpRingTimerWithRingtone(r);
 
-        getSupportActionBar().setTitle(t.getName());
-        initAllViews();
+        getSupportActionBar().setTitle(task.getName());
+        setUpButtons();
 	}
 
-	void initAllViews() {
-		startBtn = (Button) this.findViewById(R.id.startBtn);
-        stopBtn = (Button) this.findViewById(R.id.stopBtn);
+    private void setUpRingTimerWithRingtone(Ringtone ringtone) {
+        TextView timerText = (TextView) this.findViewById(R.id.timer);
+        ProgressRingView ring = (ProgressRingView) this.findViewById(R.id.timerAnim);
+
+        // Assign special font to button and timerText.
+        Typeface font = Typeface.createFromAsset(getAssets(), CHUNK_FIVE);
+        timerText.setTypeface(font);
+
+        timer = new RingTimerWithRingtone(ring, timerText, WORKING_TIME, SECOND, ringtone);
+        timer.init();
+    }
+
+    private void setUpButtons() {
+        final Button startBtn = (Button) this.findViewById(R.id.startBtn);
+        final Button stopBtn = (Button) this.findViewById(R.id.stopBtn);
         stopBtn.setEnabled(false);
 
-		TextView timerText = (TextView) this.findViewById(R.id.timer);
-		ProgressRingView ring = (ProgressRingView) this.findViewById(R.id.timerAnim);
+        startBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timer.start();
+                exchangeActivation(startBtn, stopBtn);
+            }
+        });
 
-		// Assign special font to button and timerText.
-		Typeface font = Typeface.createFromAsset(getAssets(), CHUNK_FIVE);
-		timerText.setTypeface(font);
+        stopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timer.cancel();
+                exchangeActivation(stopBtn, startBtn);
+            }
+        });
+    }
 
-        timer = new RingTimerWithRingtone(ring, timerText, START_TIME, SECOND);
-        timer.init();
-	}
-
-	@Override
+    @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.alarm, menu);
 		return true;
 	}
-
-	public void onClickStartBtn(View w) {
-        timer.start();
-        exchangeActivation(startBtn, stopBtn);
-	}
-
-    public void onClickStopBtn(View v) {
-        timer.cancel();
-        exchangeActivation(stopBtn, startBtn);
-    }
 
     private void exchangeActivation(Button b1, Button b2) {
         b1.setEnabled(false);
@@ -100,36 +113,6 @@ public class AlarmActivity extends ActionBarActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-
-    private class RingTimerWithRingtone extends RingTimer {
-
-        public RingTimerWithRingtone(ProgressRingView ringView, TextView textView,
-                                     long millisInFuture, long countDownInterval) {
-            super(ringView, textView, millisInFuture, countDownInterval);
-        }
-
-        @Override
-        protected void reset() {
-            super.reset();
-            if(r.isPlaying())
-                r.stop();
-        }
-
-        @Override
-        protected void onFinish() {
-            super.onFinish();
-            // Send notification to users.
-            //popupNotification();
-
-            try {
-                r.play();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
 
     private void popupNotification() {
         int mId = 17;
