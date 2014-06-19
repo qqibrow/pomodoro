@@ -35,7 +35,15 @@ public class RingTimer {
 
     public final void cancel() {
         timer.cancel();
+        performReset();
+    }
+
+    private void performReset() {
+        mCalled = false;
         reset();
+        if(!mCalled)
+            throw new UnsupportedOperationException("super.reset() has not been called.");
+
     }
 
     protected void reset() {
@@ -51,7 +59,7 @@ public class RingTimer {
 
         // reset ring.
         ringView.setPhase(ProgressRingView.START);
-
+        mCalled = true;
     }
 
     //    private void resetTimer() {
@@ -74,7 +82,7 @@ public class RingTimer {
 //	}
 
     public final void init() {
-        reset();
+        performReset();
     }
 
     boolean mCalled;
