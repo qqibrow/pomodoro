@@ -17,13 +17,16 @@ public class RingTimer {
 
     private static final long SECOND = 1000; // 1000 miliseconds
     private static final long MINUTE = 60 * SECOND;
-    private static final long START_TIME = 30 * SECOND;
+
+
+    private long timeInterval;
 
     public RingTimer(ProgressRingView ringView, TextView textView,
               long millisInFuture, long countDownInterval) {
         this.ringView = ringView;
         this.textView = textView;
         this.timer = new myCountDownTimer(millisInFuture, countDownInterval);
+        timeInterval = millisInFuture;
     }
 
     public final void start() {
@@ -32,6 +35,46 @@ public class RingTimer {
 
     public final void cancel() {
         timer.cancel();
+        reset();
+    }
+
+    protected void reset() {
+        // set timer back to init string.
+        long leftMinutes = timeInterval / MINUTE;
+		long leftSeconds = (timeInterval % MINUTE) / SECOND;
+		String startText = String.format("%02d:%02d", leftMinutes, leftSeconds);
+        this.textView.setText(startText);
+
+        // clear animation of timer text if necessary.
+        if(this.onFinishedAnimation != null)
+            textView.clearAnimation();
+
+        // reset ring.
+        ringView.setPhase(ProgressRingView.START);
+
+    }
+
+    //    private void resetTimer() {
+//		// Reset Text for timer.
+//		long leftMinutes = timeInterval / MINUTE;
+//		long leftSeconds = (timeInterval % MINUTE) / SECOND;
+//		String startText = String.format("%02d:%02d", leftMinutes, leftSeconds);
+//		timerText.setText(startText);
+//
+//		// Reset the flag.
+//		timerStarted = false;
+//
+//		// Clear animation for timer text.
+//		timerText.clearAnimation();
+//		ring.setPhase(ProgressRingView.START);
+//
+//		// reset ringtone.
+//		if (r.isPlaying())
+//			r.stop();
+//	}
+
+    public final void init() {
+        reset();
     }
 
     boolean mCalled;
@@ -50,8 +93,8 @@ public class RingTimer {
         textView.setText(String.format("%02d:%02d", leftMinutes,
                 leftSeconds));
 
-        float phase = (float) (START_TIME - (millisUntilFinished / 1000) * 1000)
-                / START_TIME;
+        float phase = (float) (timeInterval - (millisUntilFinished / SECOND) * SECOND)
+                / timeInterval;
         ringView.setPhase(phase);
         mCalled = true;
     }
