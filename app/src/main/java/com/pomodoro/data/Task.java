@@ -12,7 +12,29 @@ import java.util.Date;
 import java.util.List;
 
 @Table(name = "Tasks")
-public class Task extends Model implements Parcelable {
+public class Task extends Model implements Parcelable, Comparable {
+
+    // Set this.finished equals to another task's finished.
+    public void setFinished(Task task) {
+        this.finished = task.finished;
+    }
+
+    enum Priority {HiGH, LOW, MEDIAN};
+
+    @Column(name = "Name")
+    private String name;
+
+    @Column(name = "CreateTime",unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    private long createTime;
+
+    @Column(name = "due")
+    private long due;
+
+    @Column(name = "unfinished")
+    private int unfinished = 0;
+
+    @Column(name = "finished")
+    private int finished = 0;
 
     @Override
     public int describeContents() {
@@ -21,13 +43,23 @@ public class Task extends Model implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(this.createTime);
+        dest.writeString(name);
+        dest.writeLong(createTime);
+        dest.writeLong(due);
+        dest.writeInt(unfinished);
+        dest.writeInt(finished);
     }
 
     // this is used to regenerate your object. All Parcelables must have a CREATOR that implements these two methods
     public static final Parcelable.Creator<Task> CREATOR = new Parcelable.Creator<Task>() {
         public Task createFromParcel(Parcel in) {
-            return Task.getTaskByCreateTimeString(in);
+            String name = in.readString();
+            Task newOne = new Task(name);
+            newOne.createTime = in.readLong();
+            newOne.due = in.readLong();
+            newOne.unfinished = in.readInt();
+            newOne.finished = in.readInt();
+            return newOne;
         }
 
         public Task[] newArray(int size) {
@@ -46,31 +78,22 @@ public class Task extends Model implements Parcelable {
         return new Date(createTime);
     }
 
-    enum Priority {HiGH, LOW, MEDIAN};
+    public void advance() {
+        ++this.finished;
+    }
 
-    @Column(name = "Name")
-	private String name;
-
-    @Column(name = "CreateTime",unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
-	private long createTime;
-
-    @Column(name = "due")
-	private Date due;
-
-    @Column(name = "unfinished")
-	private int unfinished = 0;
-
-    @Column(name = "finished")
-	private int finished = 0;
-
-    @Column(name = "Note")
-	private Note note;
-
-    @Column(name = "TaskType")
-	private TaskType type;
-
-	private List<String> keywords;
-	private int priority;
+    @Override
+    public int compareTo(Object object) throws ClassCastException{
+        if(!(object instanceof Task))
+            throw new ClassCastException("Object is not instance of Task");
+        Task another = (Task)object;
+        if(this.createTime == another.createTime) {
+            return 0;
+        } else if(this.createTime > another.createTime) {
+            return 1;
+        } else
+            return -1;
+    }
 	
 	public Task() {
 		super();

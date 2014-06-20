@@ -31,6 +31,16 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 
     List<Task> tasks;
 
+    public void updateRelativeTask(Task another) {
+        for(Task t: tasks) {
+            if(t.getCreateTime().equals(another.getCreateTime())) {
+                t.setFinished(another);
+                t.save();
+                notifyDataSetChanged();
+            }
+        }
+    }
+
     public TaskAdapter(Context context, List<Task> tasks) {
         super(context, R.layout.row, tasks);
         this.tasks = tasks;
@@ -40,9 +50,6 @@ public class TaskAdapter extends ArrayAdapter<Task> {
     public int getCount() {
         return tasks.size();
     }
-
-
-
 
     public void addNewItem(Task t) {
         // Insert actual data into adapter.
@@ -84,6 +91,12 @@ public class TaskAdapter extends ArrayAdapter<Task> {
         for(Task t : task2remove) {
             t.delete();
             super.remove(t);
+        }
+    }
+
+    public void saveAll() {
+        for(Task t : tasks) {
+            t.save();
         }
     }
 }

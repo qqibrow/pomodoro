@@ -32,14 +32,15 @@ public class PomoTimer extends RingTimer {
 
     private final long SECOND = TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
 
-    private long currentTimeInterval;
+    // Indicate whether pomo is working or is resting.
+    boolean workMode;
 
     public PomoTimer(ProgressRingView ringView, TextView textView,
                      Ringtone r) {
         super(ringView, textView);
         this.ringtone = r;
-        currentTimeInterval = WORKING_TIME;
-        setTimer(currentTimeInterval, SECOND);
+        workMode = true;
+        setTimer(WORKING_TIME, SECOND);
     }
 
     @Override
@@ -57,21 +58,23 @@ public class PomoTimer extends RingTimer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        switchTimer();
+
         if(mOnFinishListener != null) {
             mOnFinishListener.onFinish(this);
         }
     }
 
-    public boolean isWorking() {
-        return currentTimeInterval == WORKING_TIME;
+    public boolean isWorkMode() {
+        return workMode;
     }
 
-    private void switchTimer() {
-        if (currentTimeInterval == WORKING_TIME)
-            currentTimeInterval = REST_TIME;
-        else
-            currentTimeInterval = WORKING_TIME;
-        setTimer(currentTimeInterval, SECOND);
+    public final void toWorkMode() {
+        workMode = true;
+        setTimer(WORKING_TIME, SECOND);
+    }
+
+    public final void toRestMode() {
+        workMode = false;
+        setTimer(REST_TIME, SECOND);
     }
 }

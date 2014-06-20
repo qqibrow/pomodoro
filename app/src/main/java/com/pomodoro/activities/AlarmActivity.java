@@ -55,6 +55,20 @@ public class AlarmActivity extends ActionBarActivity {
         setUpButtons();
 	}
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        intent.putExtra(AlarmActivity.POS, task);
+        setResult(MainActivity.REQUEST_CODE, intent);
+        if (getParent() == null) {
+            setResult(MainActivity.REQUEST_CODE, intent);
+        } else {
+            getParent().setResult(MainActivity.REQUEST_CODE, intent);
+        }
+        super.onBackPressed();
+    }
+
+
     private void setUpRingTimerWithRingtone(Ringtone ringtone) {
         TextView timerText = (TextView) this.findViewById(R.id.timer);
         ProgressRingView ring = (ProgressRingView) this.findViewById(R.id.timerAnim);
@@ -93,6 +107,13 @@ public class AlarmActivity extends ActionBarActivity {
             @Override
             public void onFinish(PomoTimer pomo) {
                 exchangeActivation(stopBtn, startBtn);
+                if(pomo.isWorkMode()) {
+                    task.advance();
+                    pomo.toRestMode();
+                } else {
+                    pomo.toWorkMode();
+                }
+
             }
         });
     }

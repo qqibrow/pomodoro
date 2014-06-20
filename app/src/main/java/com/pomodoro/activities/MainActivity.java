@@ -35,6 +35,17 @@ public class MainActivity extends ActionBarActivity {
     TaskAdapter taskAdapter;
     AnimateDismissAdapter animateDismissAdapter;
 
+    public final static int REQUEST_CODE = 21;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == this.REQUEST_CODE) {
+            Task returnTask = data.getParcelableExtra(AlarmActivity.POS);
+            taskAdapter.updateRelativeTask(returnTask);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +91,7 @@ public class MainActivity extends ActionBarActivity {
 
                 Intent intent = new Intent(MainActivity.this, AlarmActivity.class);
                 intent.putExtra(AlarmActivity.POS, task);
-                startActivity(intent);
+                startActivityForResult(intent, MainActivity.REQUEST_CODE);
 
             }
         });
@@ -119,6 +130,12 @@ public class MainActivity extends ActionBarActivity {
         });
         createNewTaskEditText.clearFocus();
         listView.requestFocus();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        taskAdapter.saveAll();
     }
 
     private void setLongClickToDelete(final ListView listView) {
