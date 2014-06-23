@@ -4,6 +4,8 @@ import com.pomodoro.data.Task;
 import com.pomodoro.widgets.PomoTimer;
 import com.pomodoro.widgets.ProgressRingView;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -27,7 +29,7 @@ public class AlarmActivity extends ActionBarActivity {
 //    private final long REST_TIME = 5 * MINUTE;
 
 	// All the views.
-	private PomoTimer timer;
+	private PomoTimer pomoTimer;
 
 	// Some hardcode string which could move to configuration file.
 	private static final String CHUNK_FIVE = "fonts/Chunkfive.otf";
@@ -45,7 +47,7 @@ public class AlarmActivity extends ActionBarActivity {
         Intent intent = getIntent();
         task = intent.getParcelableExtra(AlarmActivity.POS);
 
-        // Setup timer with ringtone.
+        // Setup pomoTimer with ringtone.
         Uri notification = RingtoneManager
                 .getDefaultUri(RingtoneManager.TYPE_ALARM);
         Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
@@ -65,6 +67,8 @@ public class AlarmActivity extends ActionBarActivity {
         } else {
             getParent().setResult(MainActivity.REQUEST_CODE, intent);
         }
+
+        // ATTENTION! This must be called at last!
         super.onBackPressed();
     }
 
@@ -77,8 +81,8 @@ public class AlarmActivity extends ActionBarActivity {
         Typeface font = Typeface.createFromAsset(getAssets(), CHUNK_FIVE);
         timerText.setTypeface(font);
 
-        timer = new PomoTimer(ring, timerText, ringtone);
-        timer.init();
+        pomoTimer = new PomoTimer(ring, timerText, ringtone);
+        pomoTimer.init();
     }
 
     private void setUpButtons() {
@@ -89,7 +93,7 @@ public class AlarmActivity extends ActionBarActivity {
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                timer.start();
+                pomoTimer.start();
                 exchangeActivation(startBtn, stopBtn);
             }
         });
@@ -97,19 +101,64 @@ public class AlarmActivity extends ActionBarActivity {
         stopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                timer.cancel();
-                exchangeActivation(stopBtn, startBtn);
+                String title;
+                String info;
+                if(pomoTimer.isWorkMode()) {
+                    title = "Stop Working Pomodoro";
+                    info = "Are you sure you want to stop the working pomodoro?";
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                            AlarmActivity.this);
+
+                    alertDialogBuilder
+                            .setTitle(title)
+                            .setMessage(info)
+                            .setCancelable(false)
+                            .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,int id) {
+                                    // if this button is clicked, stop working pomo.
+                                    pomoTimer.cancel();
+                                    exchangeActivation(stopBtn, startBtn);
+                                }
+                            })
+                            .setNegativeButton("No",new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,int id) {
+                                    // if this button is clicked, just close
+                                    // the dialog box and do nothing
+                                    dialog.cancel();
+                                }
+                            });
+
+                    // create alert dialog
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+
+                    // show it
+                    alertDialog.show();
+                } else {
+                    // If pomo is restmode and click stop, then it will just stop. and reset
+                    // to work mode.
+                    pomoTimer.toWorkMode();
+                }
+
             }
         });
 
-        timer.setOnFinishListener(new PomoTimer.onFinishListener() {
+        pomoTimer.setOnFinishListener(new PomoTimer.onFinishListener() {
 
             @Override
-            public void onFinish(PomoTimer pomo) {
+            public void onFinish(final PomoTimer pomo) {
+                // Make stop Button disactive, and start button active.
                 exchangeActivation(stopBtn, startBtn);
-                if(pomo.isWorkMode()) {
-                    task.advance();
-                    pomo.toRestMode();
+                if (pomo.isWorkMode()) {
+                    // show dialog.
+                    new AlertDialog.Builder(AlarmActivity.this)
+                            .setTitle("Congrats!")
+                            .setMessage("Congrats! You got ONE Pomodoro!")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    task.advance();
+                                    pomo.toRestMode();
+                                }
+                            }).show();
                 } else {
                     pomo.toWorkMode();
                 }

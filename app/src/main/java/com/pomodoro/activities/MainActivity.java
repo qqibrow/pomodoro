@@ -1,6 +1,8 @@
 package com.pomodoro.activities;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -156,11 +158,40 @@ public class MainActivity extends ActionBarActivity {
                         SparseBooleanArray checkedItemPositions = listView.getCheckedItemPositions();
 
                         //taskAdapter.removeItemsInBatch(checkedItemPositions);
-                        List<Integer> list = new LinkedList<Integer>();
+                        final List<Integer> list = new LinkedList<Integer>();
                         for(int i = 0; i < checkedItemPositions.size(); ++i) {
                             list.add(checkedItemPositions.keyAt(i));
                         }
-                        animateDismissAdapter.animateDismiss(list);
+                        String title = "Delete Selected Item";
+                        String info;
+                        if(checkedItemPositions.size() == 1) {
+                            String taskTitle =
+                                    taskAdapter.getItem(checkedItemPositions.keyAt(0)).getName();
+                            info = String.format("Are you sure you want to delete item with " +
+                                    "the title \"%s\"", taskTitle);
+                        } else if(checkedItemPositions.size() > 1) {
+                            info = String.format("Are you sure you want " +
+                                    "to delete these %d items", list.size());
+                        } else {
+                            info = "error";
+                        }
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle(title)
+                                .setMessage(info)
+                                .setPositiveButton(android.R.string.yes,
+                                        new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        animateDismissAdapter.animateDismiss(list);
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no,
+                                        new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                })
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .show();
                         mode.finish(); // Action picked, so close the CAB
                         return true;
                     default:

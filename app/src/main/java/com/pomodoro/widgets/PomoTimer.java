@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class PomoTimer extends RingTimer {
 
     public interface onFinishListener {
-        public void onFinish(PomoTimer pomo);
+        public void onFinish(final PomoTimer pomo);
     }
 
     private onFinishListener mOnFinishListener;
