@@ -13,4 +13,7 @@
     <string name="no_tasks">Start A New Task!</string>
     <string name="start_clock">START</string>
     <string name="stop_clock">STOP</string>
+    <string name="action_test">Test Mode</string>
+    <string name="action_work">Work Mode</string>
+    <string name="saved_mode">saved_mode</string>
 </resources>

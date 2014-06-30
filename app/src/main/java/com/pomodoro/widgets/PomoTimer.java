@@ -27,8 +27,8 @@ public class PomoTimer extends RingTimer {
 
     private Ringtone ringtone;
 
-    private final long WORKING_TIME = TimeUnit.MILLISECONDS.convert(25, TimeUnit.SECONDS);
-    private final long REST_TIME = TimeUnit.MILLISECONDS.convert(5, TimeUnit.SECONDS);
+    private long workTime = TimeUnit.MILLISECONDS.convert(25, TimeUnit.SECONDS);
+    private long restTime = TimeUnit.MILLISECONDS.convert(5, TimeUnit.SECONDS);
 
     private final long SECOND = TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
 
@@ -36,11 +36,14 @@ public class PomoTimer extends RingTimer {
     boolean workMode;
 
     public PomoTimer(ProgressRingView ringView, TextView textView,
-                     Ringtone r) {
+                     Ringtone r, long workTime, long restTime) {
         super(ringView, textView);
         this.ringtone = r;
-        workMode = true;
-        setTimer(WORKING_TIME, SECOND);
+
+        this.workTime = workTime;
+        this.restTime = restTime;
+
+        toWorkMode();
     }
 
     @Override
@@ -70,11 +73,11 @@ public class PomoTimer extends RingTimer {
 
     public final void toWorkMode() {
         workMode = true;
-        setTimer(WORKING_TIME, SECOND);
+        setTimer(workTime, SECOND);
     }
 
     public final void toRestMode() {
         workMode = false;
-        setTimer(REST_TIME, SECOND);
+        setTimer(restTime, SECOND);
     }
 }

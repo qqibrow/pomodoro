@@ -6,6 +6,7 @@ import com.pomodoro.widgets.ProgressRingView;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -22,6 +23,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.util.concurrent.TimeUnit;
 
 public class AlarmActivity extends ActionBarActivity {
 
@@ -81,7 +84,24 @@ public class AlarmActivity extends ActionBarActivity {
         Typeface font = Typeface.createFromAsset(getAssets(), CHUNK_FIVE);
         timerText.setTypeface(font);
 
-        pomoTimer = new PomoTimer(ring, timerText, ringtone);
+        long workTime;
+        long restTime;
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        String defaultString = "None";
+        String workMode = sharedPref.getString(getString(R.string.saved_mode), defaultString);
+        if(workMode == "Work") {
+             workTime = TimeUnit.MILLISECONDS.convert(25, TimeUnit.MINUTES);
+            restTime = TimeUnit.MILLISECONDS.convert(5, TimeUnit.MINUTES);
+        } else if(workMode == "Test") {
+            workTime = TimeUnit.MILLISECONDS.convert(25, TimeUnit.SECONDS);
+            restTime = TimeUnit.MILLISECONDS.convert(5, TimeUnit.SECONDS);
+        } else {
+            // Cannot happen.
+            workTime = 0;
+            restTime = 0;
+        }
+
+        pomoTimer = new PomoTimer(ring, timerText, ringtone, workTime, restTime);
         pomoTimer.init();
     }
 
@@ -183,9 +203,30 @@ public class AlarmActivity extends ActionBarActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
+            Intent intent = new Intent(AlarmActivity.this, SettingsActivity.class);
+            startActivity(intent);
 		}
+        else if(id == R.id.action_test) {
+            toTestMode();
+        }else if(id == R.id.action_work) {
+            toWorkMode();
+        }
 		return super.onOptionsItemSelected(item);
 	}
+
+    private void toTestMode() {
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.saved_mode), "Test");
+        editor.commit();
+    }
+
+    private void toWorkMode() {
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.saved_mode), "Work");
+        editor.commit();
+    }
 
     private void popupNotification() {
         int mId = 17;
